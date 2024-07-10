@@ -5,9 +5,9 @@ pub struct TvSeries {
     pub title: String
 }
 
-const FILE_PATH: &str = "src/data/tv_series.json";
-
+const FILE_PATH: &str = "data\\tv_series.json";
 pub fn add() {
+    clearscreen::clear().expect("failed to clear screen");
     println!("--- Add TV Series ---");
     print!("Enter title : ");
     let mut tv_series = TvSeries {
@@ -36,6 +36,7 @@ pub fn add() {
 }
 
 pub fn list() {
+    clearscreen::clear().expect("failed to clear screen");
     println!("--- List TV Series ---");
     let tv_series_list = load();
     for tv_series in tv_series_list {
@@ -54,11 +55,38 @@ fn save(tv_series: TvSeries) {
 }
 
 fn save_to_file(tv_series: Vec<TvSeries>) {
-
-    let mut file = match std::fs::File::create(FILE_PATH) {
+    let current_dir = match std::env::current_dir(){
+        Ok(data) => {
+            data
+        },
+        Err(error) => {
+            println!("Path Error : {}", error);
+            return;
+        }
+    };
+    let path = current_dir.join(FILE_PATH);
+    let parent_path = match path.parent() {
+        Some(data) => data,
+        None => {
+            println!("Parent Path Error");
+            return;
+        }
+    };
+    if !path.exists() {
+        match std::fs::create_dir_all(&parent_path) {
+            Ok(_) => {
+                println!("Path created successfully");
+            },
+            Err(error) => {
+                println!("Path Creation Error : {} \n Path: {}", error,path.display());
+                return;
+            }
+        }
+    }
+    let mut file = match std::fs::File::create(path) {
         Ok(data) => data,
         Err(error) => {
-            println!("Error : {}", error);
+            println!("File Read Error : {}", error);
             return;
         }
     };
@@ -91,7 +119,9 @@ fn check_duplicates(title: &str, tv_series_list: &Vec<TvSeries>) -> bool {
 }
 
 fn load() -> Vec<TvSeries> {
-    match std::fs::read_to_string(FILE_PATH) {
+    let current_dir = std::env::current_dir().unwrap();
+    let path = current_dir.join(FILE_PATH);
+    match std::fs::read_to_string(path) {
         Ok(data) => {
             serde_json::from_str(&data).unwrap_or_else(|error| {
                 println!("Error : {}", error);

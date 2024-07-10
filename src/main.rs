@@ -15,11 +15,11 @@ fn main() {
 
 fn menu() -> Menu {
     println!("\n--- Menu ---");
-    println!("1. Search TV Series");
+    println!("1. List TV Series");
     println!("2. Add TV Series");
     println!("3. Exit");
     println!("-------------");
-    print!("Enter :");
+    print!("Enter : ");
     match std::io::stdout().flush() {
         Ok(_) => {},
         Err(error) => {

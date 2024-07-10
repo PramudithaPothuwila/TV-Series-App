@@ -75,7 +75,7 @@ fn save_to_file(tv_series: Vec<TvSeries>) {
 
 fn check_duplicates(title: &str, tv_series_list: &Vec<TvSeries>) -> bool {
     for tv_series in tv_series_list {
-        if tv_series.title == title {
+        if tv_series.title.to_lowercase() == title.to_lowercase() {
             return true;
         }
     }

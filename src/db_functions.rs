@@ -40,13 +40,13 @@ pub fn add_menu() {
                     }             },
                 Err(error) => {
                     println!("Error : {}", error);
-                    return add();
+                    add();
                 }
             }
         },
         Err(error) => {
             println!("Error : {}", error);
-            return add();
+            add();
         }
     }
 }

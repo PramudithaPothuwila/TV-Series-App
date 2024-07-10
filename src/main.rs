@@ -7,7 +7,7 @@ fn main() {
         let menu_option = menu();
         match menu_option {
             Menu::List => db_functions::list(),
-            Menu::Add => db_functions::add(),
+            Menu::Add => db_functions::add_menu(),
             Menu::Exit => break,
         }
     }

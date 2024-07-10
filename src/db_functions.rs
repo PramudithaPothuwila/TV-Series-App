@@ -6,9 +6,51 @@ pub struct TvSeries {
 }
 
 const FILE_PATH: &str = "data\\tv_series.json";
-pub fn add() {
+
+pub fn add_menu() {
     clearscreen::clear().expect("failed to clear screen");
     println!("--- Add TV Series ---");
+    println!("1. Add Single TV Series");
+    println!("2. Add Multiple TV Series");
+    println!("3. Back");
+    println!("----------------------");
+    print!("Enter : ");
+
+    match std::io::stdout().flush() {
+        Ok(_) => {
+            let mut title = String::new();
+            match std::io::stdin().read_line(&mut title) {
+                    Ok(_) => {
+                    match title.trim().parse::<i32>() {
+                        Ok(data) => {
+                            match data {
+                                1 => add(),
+                                2 => add_multiple(),
+                                3 => {},
+                                _ => {
+                                    println!("Invalid input");
+                                    add_menu();
+                                }
+                            }
+                        },
+                        Err(error) => {
+                            println!("Error : {}", error);
+                            add_menu();
+                        }
+                    }             },
+                Err(error) => {
+                    println!("Error : {}", error);
+                    return add();
+                }
+            }
+        },
+        Err(error) => {
+            println!("Error : {}", error);
+            return add();
+        }
+    }
+}
+fn add() {
     print!("Enter title : ");
     let mut tv_series = TvSeries {
         title: String::new()
@@ -34,6 +76,41 @@ pub fn add() {
     }
     save(tv_series);
 }
+
+fn add_multiple() {
+    loop {
+        println!("Enter title (or type 'exit' to stop) : ");
+
+        let mut tv_series = TvSeries {
+            title: String::new()
+        };
+
+        match std::io::stdout().flush() {
+            Ok(_) => {
+                let mut title = String::new();
+                match std::io::stdin().read_line(&mut title) {
+                    Ok(_) => {
+                        if title.trim().to_lowercase() == "exit" {
+                            break;
+                        }
+                        tv_series.title = title.trim().to_string();
+                        save(tv_series);
+                    },
+                    Err(error) => {
+                        println!("Error : {}", error);
+                        return add_multiple();
+                    }
+                }
+            },
+            Err(error) => {
+                println!("Error : {}", error);
+                return add_multiple();
+            }
+        }
+
+    }
+}
+
 
 pub fn list() {
     clearscreen::clear().expect("failed to clear screen");
@@ -95,9 +172,7 @@ fn save_to_file(tv_series: Vec<TvSeries>) {
         Ok(data) => {
             let data = data.as_bytes();
             match file.write_all(data) {
-                Ok(_) => {
-                    println!("Data saved successfully");
-                },
+                Ok(_) => {},
                 Err(error) => {
                     println!("Error : {}", error);
                 }

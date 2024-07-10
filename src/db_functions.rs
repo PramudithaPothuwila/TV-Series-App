@@ -35,6 +35,14 @@ pub fn add() {
     save(tv_series);
 }
 
+pub fn list() {
+    println!("--- List TV Series ---");
+    let tv_series_list = load();
+    for tv_series in tv_series_list {
+        println!("{}", tv_series.title);
+    }
+}
+
 fn save(tv_series: TvSeries) {
     let mut tv_series_list = load();
     if check_duplicates(&tv_series.title, &tv_series_list) {

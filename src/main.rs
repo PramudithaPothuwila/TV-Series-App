@@ -6,7 +6,7 @@ fn main() {
     loop {
         let menu_option = menu();
         match menu_option {
-            Menu::Search => search(),
+            Menu::List => db_functions::list(),
             Menu::Add => db_functions::add(),
             Menu::Exit => break,
         }
@@ -34,7 +34,7 @@ fn menu() -> Menu {
             match line.trim().parse::<i32>() {
                 Ok(data) => {
                     match data {
-                        1 => Menu::Search,
+                        1 => Menu::List,
                         2 => Menu::Add,
                         3 => Menu::Exit,
                         _ => {
@@ -60,7 +60,7 @@ fn search() {
     println!("--- Search TV Series ---");
 }
 enum Menu {
-    Search,
+    List,
     Add,
     Exit,
 }

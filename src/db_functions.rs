@@ -1,34 +1,95 @@
 use serde::{Deserialize, Serialize};
-
-pub fn search() {
-    println!("--- Search TV Series ---");
-}
-
+use std::io::Write;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TvSeries {
-    pub title: String,
-    pub seasons: i32,
+    pub title: String
 }
-fn load_data() -> Vec<TvSeries> {
-    let mut tv_series = Vec::new();
 
-    let file = std::fs::File::open("data/tv_series.json");
+const FILE_PATH: &str = "src/data/tv_series.json";
 
-    match file {
-        Ok(data) => {
-            match serde_json::from_reader(data) {
-                Ok(data) => {
-                    tv_series = data;
+pub fn add() {
+    println!("--- Add TV Series ---");
+    print!("Enter title : ");
+    let mut tv_series = TvSeries {
+        title: String::new()
+    };
+
+    match std::io::stdout().flush() {
+        Ok(_) => {
+            let mut title = String::new();
+            match std::io::stdin().read_line(&mut title) {
+                Ok(_) => {
+                    tv_series.title = title.trim().to_string()
                 },
-                Err(_) => {
-                    println!("Error : Failed to parse data");
-                    return tv_series;
+                Err(error) => {
+                    println!("Error : {}", error);
+                    return add();
                 }
             }
         },
-        Err(_) => {
-            println!("Error : Failed to load data");
+        Err(error) => {
+            println!("Error : {}", error);
+            return add();
         }
     }
-    return tv_series;
+    save(tv_series);
+}
+
+fn save(tv_series: TvSeries) {
+    let mut tv_series_list = load();
+    if check_duplicates(&tv_series.title, &tv_series_list) {
+        println!("Title already exists");
+        return;
+    }
+    tv_series_list.push(tv_series);
+    save_to_file(tv_series_list);
+}
+
+fn save_to_file(tv_series: Vec<TvSeries>) {
+
+    let mut file = match std::fs::File::create(FILE_PATH) {
+        Ok(data) => data,
+        Err(error) => {
+            println!("Error : {}", error);
+            return;
+        }
+    };
+
+    match serde_json::to_string(&tv_series) {
+        Ok(data) => {
+            let data = data.as_bytes();
+            match file.write_all(data) {
+                Ok(_) => {
+                    println!("Data saved successfully");
+                },
+                Err(error) => {
+                    println!("Error : {}", error);
+                }
+            }
+        },
+        Err(error) => {
+            println!("Error : {}", error);
+        }
+    }
+}
+
+fn check_duplicates(title: &str, tv_series_list: &Vec<TvSeries>) -> bool {
+    for tv_series in tv_series_list {
+        if tv_series.title == title {
+            return true;
+        }
+    }
+    false
+}
+
+fn load() -> Vec<TvSeries> {
+    match std::fs::read_to_string(FILE_PATH) {
+        Ok(data) => {
+            serde_json::from_str(&data).unwrap_or_else(|error| {
+                println!("Error : {}", error);
+                Vec::new()
+            })
+        },
+        Err(_) => Vec::new()
+    }
 }

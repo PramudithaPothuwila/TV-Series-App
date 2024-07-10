@@ -55,10 +55,6 @@ fn menu() -> Menu {
         }
     }
 }
-
-fn search() {
-    println!("--- Search TV Series ---");
-}
 enum Menu {
     List,
     Add,

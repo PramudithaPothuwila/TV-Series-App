@@ -73,7 +73,7 @@ fn save_to_file(tv_series: Vec<TvSeries>) {
         }
     };
     if !path.exists() {
-        match std::fs::create_dir_all(&parent_path) {
+        match std::fs::create_dir_all(parent_path) {
             Ok(_) => {
                 println!("Path created successfully");
             },
